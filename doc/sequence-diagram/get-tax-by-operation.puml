@@ -1,0 +1,105 @@
+@startuml
+
+actor User
+
+User -> AppCommandLine: Send a line with the operation list in json format
+
+activate AppCommandLine
+
+AppCommandLine -> JsonParser: Parse the json to a list of dto objects
+
+activate JsonParser
+
+JsonParser --> AppCommandLine
+
+deactivate JsonParser
+
+loop for each item in the dtos list
+
+AppCommandLine -> OperationTaxCalculationService
+
+activate OperationTaxCalculationService
+
+OperationTaxCalculationService -> OperationConverter: Performs the conversion from dto to entity
+
+activate OperationConverter
+
+OperationConverter --> OperationTaxCalculationService
+
+deactivate OperationConverter
+
+OperationTaxCalculationService -> OperationRepository: Save operation entity
+
+activate OperationRepository
+
+OperationRepository --> OperationTaxCalculationService
+
+deactivate OperationRepository
+
+alt if the type of operation is buy
+
+OperationTaxCalculationService --> AppCommandLine: Returns zero tax
+
+else if the type of operation is sell
+
+OperationTaxCalculationService -> OperationRepository: Get the list of operations from the repository to calculate the weighted average
+
+activate OperationRepository
+
+OperationRepository --> OperationTaxCalculationService
+
+deactivate OperationRepository
+
+OperationTaxCalculationService -> OperationTaxCalculationService: Calculate the weighted average
+
+OperationTaxCalculationService -> OperationTaxCalculationService: Calculates total operation amount
+
+alt if the operation has gain
+
+alt if the operation is within the established limit (limit = 20k)
+
+OperationTaxCalculationService --> AppCommandLine: Returns zero tax
+
+else if operation is not within the established limit
+
+OperationTaxCalculationService -> OperationTaxCalculationService: Calculate gain amount
+
+alt if there is a loss to deduct
+
+OperationTaxCalculationService -> OperationTaxCalculationService: Discount loss from gain
+
+end
+
+OperationTaxCalculationService -> OperationTaxCalculationService: Calculate tax from gain (aliquot = 20%)
+
+OperationTaxCalculationService --> AppCommandLine: Returns calculated tax
+
+end
+
+else if the operation has no gain
+
+OperationTaxCalculationService -> OperationTaxCalculationService: Increments total loss
+
+OperationTaxCalculationService --> AppCommandLine: Returns zero tax
+
+end
+
+end
+
+end
+
+deactivate OperationTaxCalculationService
+
+AppCommandLine -> JsonParser: Converts the list of objects to a list of dtos.
+
+activate JsonParser
+
+JsonParser --> AppCommandLine
+
+deactivate JsonParser
+
+AppCommandLine --> User: Returns the tax amounts to the user
+
+deactivate AppCommandLine
+
+@enduml
