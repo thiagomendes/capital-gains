@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-public class OperationTaxCalculationControllerIntTest {
+class OperationTaxCalculationControllerIntTest {
 
     private MockMvc mockMvc;
 
