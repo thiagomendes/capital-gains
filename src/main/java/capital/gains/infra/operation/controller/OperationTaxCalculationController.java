@@ -1,4 +1,4 @@
-package capital.gains.infra.controller;
+package capital.gains.infra.operation.controller;
 
 import capital.gains.application.operation.dto.OperationInputDto;
 import capital.gains.application.operation.dto.OperationOutputDto;

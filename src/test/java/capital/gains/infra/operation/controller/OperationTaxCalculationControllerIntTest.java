@@ -1,6 +1,5 @@
 package capital.gains.infra.operation.controller;
 
-import capital.gains.infra.controller.OperationTaxCalculationController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
