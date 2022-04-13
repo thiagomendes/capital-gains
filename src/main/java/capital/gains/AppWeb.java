@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AppWebConfig {
+public class AppWeb {
 
     public static void main(String[] args) {
-        SpringApplication.run(AppWebConfig.class, args);
+        SpringApplication.run(AppWeb.class, args);
     }
 }
