@@ -4,14 +4,15 @@ import capital.gains.application.operation.dto.OperationInputDto;
 import capital.gains.application.operation.dto.OperationOutputDto;
 import capital.gains.application.operation.service.OperationTaxCalculationService;
 import capital.gains.application.operation.service.OperationTaxCalculationServiceImpl;
-import capital.gains.infra.operation.repository.OperationRepositoryInMemoryImpl;
 import capital.gains.infra.common.util.JsonParser;
+import capital.gains.infra.operation.repository.OperationRepositoryInMemoryImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 public class AppCommandLine {
 
@@ -31,11 +32,15 @@ public class AppCommandLine {
     public static String processInput(String line) throws JsonProcessingException {
         List<OperationInputDto> operations = Arrays.asList(JsonParser.toObject(line, OperationInputDto[].class));
         OperationTaxCalculationService operationTaxCalculationService = new OperationTaxCalculationServiceImpl(new OperationRepositoryInMemoryImpl());
+        List<OperationOutputDto> operationsTaxes = new ArrayList<>();
 
-        List<OperationOutputDto> operationsTaxes = operations
-                .stream()
-                .map(operationTaxCalculationService::getTaxByOperation)
-                .collect(Collectors.toList());
+        operations.forEach(i -> {
+            if ("sell".equals(i.getOperation()) && i.getQuantity() > operationTaxCalculationService.getTotalQuantity()) {
+                operationsTaxes.add(new OperationOutputDto(BigDecimal.ZERO, "Can't sell more stocks than you have"));
+            } else {
+                operationsTaxes.add(operationTaxCalculationService.getTaxByOperation(i));
+            }
+        });
 
         return JsonParser.toJson(operationsTaxes);
     }

@@ -80,7 +80,7 @@ public class OperationTaxCalculationServiceImpl implements OperationTaxCalculati
         this.totalLoss = totalLoss.add(calculateLoss(operationAmount, weightedAverage, operation.getQuantity()));
     }
 
-    private boolean isBuy(Operation operation) {
+    public boolean isBuy(Operation operation) {
         return OperationType.BUY.equals(operation.getType());
     }
 
@@ -105,6 +105,14 @@ public class OperationTaxCalculationServiceImpl implements OperationTaxCalculati
 
     private BigDecimal calculateLoss(BigDecimal operationAmount, BigDecimal weightedAverage, long operationQuantity) {
         return weightedAverage.multiply(new BigDecimal(operationQuantity)).subtract(operationAmount);
+    }
+
+    public long getTotalQuantity() {
+        return this.operationRepository
+                .findAll()
+                .stream()
+                .mapToLong(o -> o.getType().equals(OperationType.BUY) ? o.getQuantity() : o.getQuantity() * -1)
+                .sum();
     }
 
     private BigDecimal calculateWeightedAverage() {
